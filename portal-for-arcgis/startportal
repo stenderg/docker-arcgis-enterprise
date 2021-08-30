@@ -2,6 +2,7 @@
 #
 PORTALNAME="portal"
 DOCKERHOST=`hostname`
+AGS_DOMAIN="lgb.local"
 
 # Stop a previous instance, if any.
 docker stop ${PORTALNAME} > /dev/null 2>&1
@@ -16,5 +17,5 @@ docker run -d --name=${PORTALNAME} --net-alias=${PORTALNAME} \
     -p 7080:7080 -p 7443:7443 \
     -e AGS_USER -e AGS_PASSWORD -e AGS_DOMAIN \
     -v `pwd`/data/arcgisportal:/home/arcgis/portal/usr/arcgisportal \
-    wildsong/portal-for-arcgis
+    portal-for-arcgis
 

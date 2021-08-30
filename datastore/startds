@@ -2,6 +2,7 @@
 
 DATASTORE_NAME="datastore"
 DOCKER_HOST=`hostname`
+AGS_DOMAIN="lgb.local"
 
 # Stop a previous instance, if any.
 docker stop ${DATASTORE_NAME} > /dev/null 2>&1
@@ -15,5 +16,5 @@ docker run -d --name=${DATASTORE_NAME} \
     -p 2443:2443 \
     -e AGS_USER -e AGS_PASSWORD -e AGS_DOMAIN \
     -v `pwd`/data/datastore:/home/arcgis/data \
-    wildsong/datastore bash
+    datastore bash
 

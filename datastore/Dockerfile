@@ -1,7 +1,14 @@
-From wildsong/ubuntu-server:latest
+From ubuntu:latest
 LABEL maintainer="brian@wildsong.biz"
 ENV REFRESHED_AT 2021-07-06
-ENV ESRI_VERSION 10.6
+ENV ESRI_VERSION 10.8
+
+RUN apt-get update && apt-get install -y curl && apt-get install -y python3-pip
+RUN pip install requests
+
+# Add user arcgis
+RUN useradd -ms /bin/bash arcgis
+ENV HOME /home/arcgis/
 
 EXPOSE 2443 
 # If you are not using a Docker network to connect containers
@@ -9,7 +16,7 @@ EXPOSE 2443
 # EXPOSE 9876 29080 29081 9220 9320
 
 # "ADD" knows how to unpack the tar file directly into the docker image.
-ADD ArcGIS_DataStore_Linux_106*.tar.gz ${HOME}
+ADD ArcGIS_DataStore_Linux_10*.tar.gz ${HOME}
 
 # Change owner so that arcgis can rm later.
 RUN chown -R arcgis:arcgis ${HOME}

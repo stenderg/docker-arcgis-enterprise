@@ -10,7 +10,7 @@ then
     exit 1
 fi
 
-AGS="server.${AGS_DOMAIN}"
+AGS="arcgis-server.${AGS_DOMAIN}"
 PORTAL="portal.${AGS_DOMAIN}"
 
 # ESRI likes its hostname to be ALL UPPER CASE! but SOMETIMES not

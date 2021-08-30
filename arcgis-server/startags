@@ -1,8 +1,9 @@
 # Docker command to start ArcGIS Server in detached mode.
 #
-AGSNAME="server"
+AGSNAME="arcgis_server"
 DOCKERHOST=`hostname`
-AGSVERSION="10.6"
+AGSVERSION="10.8"
+AGS_DOMAIN="lgb.local"
 
 # Stop a previous detached server, if any.
 docker stop ${AGSNAME} > /dev/null 2>&1
@@ -19,4 +20,4 @@ docker run -d --name=${AGSNAME} --net-alias=${AGSNAME}  \
     -v `pwd`/data/directories:/home/arcgis/server/usr/directories \
     -v `pwd`/data/logs:/home/arcgis/server/usr/logs \
     -v `pwd`/data/sysgen:/home/arcgis/server/framework/runtime/.wine/drive_c/Program\ Files/ESRI/License${AGSVERSION}/sysgen \
-    wildsong/arcgis-server
+    arcgis-server

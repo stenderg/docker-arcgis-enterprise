@@ -2,9 +2,10 @@
 # you will have to start the server running from a command prompt.
 # NOTE: The container will stop when you exit from the shell!
 
-AGSNAME="server"
+AGSNAME="arcgis-server"
 DOCKERHOST=`hostname`
-AGSVERSION="10.6"
+AGSVERSION="10.8"
+AGS_DOMAIN="lgb.local"
 
 # Stop a previous instance, if any.
 docker stop ${AGSNAME} > /dev/null 2>&1
@@ -12,6 +13,7 @@ docker rm ${AGSNAME} > /dev/null 2>&1
 
 echo "Docker is starting in interactive mode."
 echo "Management URL is http://${DOCKERHOST}:6080/arcgis/manager"
+echo "AGSNAME = ${AGSNAME} and AGS_DOMAIN = ${AGS_DOMAIN}" 
 
 # Try to install a keycodes file to avoid licensing on every run
 cp keycodes data/sysgen/
@@ -19,14 +21,23 @@ cp keycodes data/sysgen/
 echo "Start AGS and configure it with  ./start.sh"
 
 # Start a new server container
-docker run -it --rm --name=${AGSNAME} --net-alias=${AGSNAME}  \
-    --hostname=${AGSNAME}.${AGS_DOMAIN} --net=${AGS_DOMAIN} \
+docker run -it --rm --name=${AGSNAME} --network-alias=${AGSNAME}  \
+    --hostname=${AGSNAME}.${AGS_DOMAIN} --network=${AGS_DOMAIN} \
     -e AGS_USER -e AGS_PASSWORD -e AGS_DOMAIN \
     -p 6080:6080 -p 6443:6443 \
     -v `pwd`/data/config-store:/home/arcgis/server/usr/config-store \
     -v `pwd`/data/directories:/home/arcgis/server/usr/directories \
     -v `pwd`/data/logs:/home/arcgis/server/usr/logs \
     -v `pwd`/data/sysgen:/home/arcgis/server/framework/runtime/.wine/drive_c/Program\ Files/ESRI/License${AGSVERSION}/sysgen \
-    wildsong/arcgis-server bash
+    arcgis-server bash
+
+#docker run -it --rm --name=${AGSNAME}  \
+#    -e AGS_USER -e AGS_PASSWORD \
+#    -p 6080:6080 -p 6443:6443 \
+#    -v `pwd`/data/config-store:/home/arcgis/server/usr/config-store \
+#    -v `pwd`/data/directories:/home/arcgis/server/usr/directories \
+#    -v `pwd`/data/logs:/home/arcgis/server/usr/logs \
+#    -v `pwd`/data/sysgen:/home/arcgis/server/framework/runtime/.wine/drive_c/Program\ Files/ESRI/License${AGSVERSION}/sysgen \
+#    arcgis-server bash
 
 echo "${AGSNAME} docker removed."

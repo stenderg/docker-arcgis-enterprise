@@ -17,7 +17,7 @@ import json
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
-hostname = "server" # localhost would almost always work here I think
+hostname = "localhost" # localhost would almost always work here I think
 
 class arcgis(object):
 

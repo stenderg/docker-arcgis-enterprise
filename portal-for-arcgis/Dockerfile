@@ -1,7 +1,10 @@
-From wildsong/ubuntu-server:latest
+From ubuntu:latest
 LABEL maintainer="brian@wildsong.biz"
-ENV REFRESHED_AT 2021-07-06
-ENV ESRI_VERSION 10.6
+ENV REFRESHED_AT 2021-08-27
+ENV ESRI_VERSION 10.8
+
+RUN apt-get update && apt-get install -y curl && apt-get install -y python3-pip
+RUN pip install requests
 
 # Port information: http://server.arcgis.com/en/portal/latest/install/windows/ports-used-by-portal-for-arcgis.htm
 EXPOSE 7080 7443
@@ -9,13 +12,15 @@ EXPOSE 7080 7443
 # Probably don't need this for Portal
 ADD limits.conf /etc/security/limits.conf
 
-ENV HOME /home/arcgis
+# Add user arcgis
+RUN useradd -ms /bin/bash arcgis
+ENV HOME /home/arcgis/
 
 # Put your license file and a downloaded copy of the server software
 # in the same folder as this Dockerfile
-ADD *.prvc /home/arcgis
+ADD *.prvc ${HOME}
 # "ADD" knows how to unpack the tar file directly into the docker image.
-ADD Portal_for_ArcGIS_Linux_10*.tar.gz /home/arcgis
+ADD Portal_for_ArcGIS_Linux_10*.tar.gz ${HOME}
 
 # Add the script that can create the initial admin user and site
 # I can't actually run the create_new_site.py here because it will have
@@ -42,7 +47,7 @@ RUN mkdir -p portal/usr/arcgisportal
 # Change command line prompt
 ADD bashrc ./.bashrc
 
-ENV HOSTNAME portal.wildsong.lan
+ENV HOSTNAME portal.lgb.local
 
 # It's okay to use the random Docker hostname at this point, but
 # we have to fix up the properties filename and we have to use
@@ -54,7 +59,8 @@ ENV HOSTNAME portal.wildsong.lan
 #   -l yes            You agree to the License Agreement
 #   -a license_file   Use "license_file" to add your license. It can be a .ecp or .prvc file.
 #   -d dest_dir       Default is /home/arcgis/arcgis/portal
-RUN cd PortalForArcGIS && ./Setup -m silent --verbose -l yes -a $HOME/*.prvc -d $HOME
+#RUN cd PortalForArcGIS && ./Setup -m silent --verbose -l yes -a $HOME/*.prvc -d $HOME
+RUN cd PortalForArcGIS && ./Setup -m silent --verbose -l yes -d $HOME
 
 # We are done with the installer, get rid of it now.
 RUN rm -rf PortalForArcGIS

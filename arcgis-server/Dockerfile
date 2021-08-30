@@ -1,7 +1,10 @@
-From wildsong/ubuntu-server:latest
+From ubuntu:latest
 LABEL maintainer="brian@wildsong.biz"
 ENV REFRESHED_AT 2021-07-06
-ENV ESRI_VERSION 10.6
+ENV ESRI_VERSION 10.8
+
+RUN apt-get update && apt-get install -y curl && apt-get install -y python3-pip
+RUN pip install requests
 
 EXPOSE 6080 6443
 # If you are not using a Docker network to connect containers
@@ -11,14 +14,16 @@ EXPOSE 6080 6443
 # Refer to ESRI docs; this expands limits for user arcgis.
 ADD limits.conf /etc/security/limits.conf
 
-ENV HOME /home/arcgis
+# Add user arcgis
+RUN useradd -ms /bin/bash arcgis
+ENV HOME /home/arcgis/
 
 # Put your license file and a downloaded copy of the server software
 # in the same folder as this Dockerfile
 ADD *.prvc ${HOME}
 
 # "ADD" knows how to unpack the tar file directly into the docker image.
-ADD ArcGIS_Server_Linux_106*.tar.gz ${HOME}
+ADD ArcGIS_Server_Linux_108*.tar.gz ${HOME}
 
 # Add the script that can create the initial admin user and site
 # I can't actually run the create_new_site.py here because it will have
@@ -28,7 +33,7 @@ ADD create_new_site.py ${HOME}
 # Instead this script will run create_new_site.py..
 ADD start.sh ${HOME}
 
-RUN chown -R arcgis.arcgis ${HOME}
+RUN chown -R arcgis:arcgis ${HOME}
 
 # Start in the arcgis user's home directory.
 WORKDIR ${HOME}
@@ -39,12 +44,12 @@ ENV LOGNAME arcgis
 # Run the ESRI installer script as user 'arcgis' with these options:
 #   -m silent         silent mode: don't pop up windows, we don't have a screen
 #   -l yes            Agree to the License Agreement
-RUN cd ArcGISServer && ./Setup -m silent --verbose -l yes
+RUN cd ${HOME}/ArcGISServer* && ./Setup -m silent --verbose -l yes
 
 # After Setup is complete, delete installer to free up space.  
 # If you are a developer you might want to leave it to get access to diagnostics, see
 # http://server.arcgis.com/en/server/latest/administer/linux/checking-server-diagnostics-using-the-diagnostics-tool.htm
-RUN rm -rf ${HOME}/ArcGISServer
+RUN rm -rf ${HOME}/ArcGISServer*
 
 # Persist ArcGIS Server's data on the host's file system. Make sure these are writable by container.
 VOLUME ["${HOME}/server/usr/config-store", \
